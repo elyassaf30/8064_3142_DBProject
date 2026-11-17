@@ -6,7 +6,7 @@
 --  Creation order respects foreign-key dependencies:
 --    STAFF_MEMBER -> DORM_MANAGER, CASHIER
 --    STUDENT
---    BUILDING -> ROOM_TYPE -> ROOM -> ASSIGNED_TO
+--    BUILDING -> ROOM -> ASSIGNED_TO
 --    GYM_MEMBERSHIP, TUTORING_SESSION
 --    MENU_CATEGORY -> MENU_ITEM -> MEAL_PURCHASE -> INCLUDES
 -- =====================================================================
@@ -98,15 +98,6 @@ CREATE TABLE BUILDING
   CONSTRAINT chk_building_floors   CHECK (num_floors BETWEEN 1 AND 30)
 );
 
-CREATE TABLE ROOM_TYPE
-(
-  room_type_id  INT          NOT NULL,
-  type_name     VARCHAR(30)  NOT NULL,
-  CONSTRAINT pk_room_type          PRIMARY KEY (room_type_id),
-  CONSTRAINT uq_room_type_name     UNIQUE (type_name),
-  CONSTRAINT chk_room_type_id      CHECK (room_type_id > 0)
-);
-
 -- Weak entity: identified by (building_id, room_number)
 CREATE TABLE ROOM
 (
@@ -114,12 +105,9 @@ CREATE TABLE ROOM
   room_number   INT  NOT NULL,
   floor         INT  NOT NULL,
   capacity      INT  NOT NULL,
-  room_type_id  INT  NOT NULL,                   -- relationship "of_type" (N:1)
   CONSTRAINT pk_room               PRIMARY KEY (building_id, room_number),
   CONSTRAINT fk_room_building      FOREIGN KEY (building_id)
       REFERENCES BUILDING (building_id) ON DELETE CASCADE,
-  CONSTRAINT fk_room_type          FOREIGN KEY (room_type_id)
-      REFERENCES ROOM_TYPE (room_type_id) ON DELETE RESTRICT,
   CONSTRAINT chk_room_number       CHECK (room_number > 0),
   CONSTRAINT chk_room_floor        CHECK (floor BETWEEN 0 AND 30),
   CONSTRAINT chk_room_capacity     CHECK (capacity BETWEEN 1 AND 6)
