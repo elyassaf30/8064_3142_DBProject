@@ -213,7 +213,62 @@ PK = מפתח ראשי, FK = מפתח זר. כל השדות הם שדות חוב
 
 ## הכנסת נתונים
 
+הנתונים הוכנסו בשלוש שיטות. הקובץ `insertTables.sql` מאחד את שלושתן לפי הסדר A, B, C, בתוך טרנזקציה אחת.
 בכל טבלה יש לפחות 500 שורות, ובשתי טבלאות יותר מ-20,000 (30,000 רכישות ו-75,000 פריטים ברכישות).
+
+### שיטה A – פקודות INSERT ידניות (תיקייה `ManualInserts`)
+
+פקודות שנכתבו ביד: 12 קטגוריות התפריט הבסיסיות (ארוחת בוקר, מנה עיקרית, סלטים וכו').
+שיטה B ממשיכה את הטבלה מהמספר הפנוי הבא (13 ואילך).
+
+<img src="screens/insert_manual.png" width="800">
+
+### שיטה B – סקריפט פייתון (תיקייה `Programing`)
+
+הסקריפט `generate_data.py` מייצר פקודות INSERT לעשר טבלאות: אנשי צוות, אחראי מעונות, קופאים, סטודנטים,
+בניינים, חדרים, שיבוצים, מנויים, קטגוריות ומנות.
+הסקריפט שומר על כל האילוצים: טלפונים ייחודיים, חדר לא מתמלא מעבר לקיבולת, ואין שיבוצים או מנויים חופפים לאותו סטודנט.
+`random.seed` קבוע, ולכן כל הרצה מייצרת בדיוק את אותם נתונים.
+הפלט שלו נשמר ב-`generatedInserts.sql`, והוא גם בונה מחדש את `insertTables.sql`.
+
+</div>
+
+```
+cd "שלב א"
+python Programing/generate_data.py
+```
+
+<div dir="rtl">
+
+<img src="screens/insert_python.png" width="800">
+
+### שיטה C – generate_series בתוך PostgreSQL (תיקייה `PostgresGenerateSeries`)
+
+שלוש הטבלאות הגדולות נוצרות בתוך מסד הנתונים עצמו, בעזרת `generate_series()` ו-`random()`:
+5,000 שיעורי עזר, 30,000 רכישות, וכ-75,000 פריטים ברכישות (1-4 מנות שונות בכל רכישה).
+`setseed` קבוע, ולכן התוצאה זהה בכל הרצה.
+
+<img src="screens/insert_generate_series.png" width="800">
+
+### ספירת השורות בכל טבלה
+
+| טבלה | שורות | שיטה |
+|---|---|---|
+| STAFF_MEMBER | 1,200 | B |
+| DORM_MANAGER | 500 | B |
+| CASHIER | 600 | B |
+| STUDENT | 3,000 | B |
+| BUILDING | 500 | B |
+| ROOM | 2,986 | B |
+| ASSIGNED_TO | 6,750 | B |
+| GYM_MEMBERSHIP | 2,500 | B |
+| MENU_CATEGORY | 500 | A (12) + B (488) |
+| MENU_ITEM | 1,000 | B |
+| TUTORING_SESSION | 5,000 | C |
+| MEAL_PURCHASE | 30,000 | C |
+| INCLUDES | 75,000 | C |
+
+<img src="screens/row_counts.png" width="600">
 
 ## גיבוי ושחזור
 
@@ -229,7 +284,27 @@ docker exec PostgreSQL_DB pg_dump -U welfare_user -d welfare_db -F c -f /backups
 
 <div dir="rtl">
 
+<img src="screens/backup_cmd.png" width="800">
+
 2. **pgAdmin** (Backup מתוך הממשק): `backup_2026-11-17_pgadmin.backup`
+
+<img src="screens/backup_pgadmin.png" width="800">
+
+### שחזור על מחשב אחר
+
+הגיבוי שוחזר על מחשב שני למסד ריק, ובדקנו בעזרת `selectAll.sql` שכל הטבלאות וכל השורות קיימות.
+
+</div>
+
+```
+docker cp "backup_2026-11-17.backup" PostgreSQL_DB:/tmp/backup.backup
+docker exec PostgreSQL_DB createdb -U welfare_user welfare_restore
+docker exec PostgreSQL_DB pg_restore -U welfare_user -d welfare_restore /tmp/backup.backup
+```
+
+<div dir="rtl">
+
+<img src="screens/restore_other_pc.png" width="800">
 
 ## קבצי השלב
 
@@ -237,7 +312,10 @@ docker exec PostgreSQL_DB pg_dump -U welfare_user -d welfare_db -F c -f /backups
 |---|---|
 | `createTables.sql` | יצירת כל הטבלאות והאילוצים |
 | `dropTables.sql` | מחיקת כל הטבלאות בסדר הנכון |
-| `insertTables.sql` | הכנסת הנתונים |
+| `insertTables.sql` | הכנסת הנתונים (שלוש השיטות יחד) |
+| `ManualInserts/` | שיטה A – פקודות INSERT ידניות |
+| `Programing/` | שיטה B – סקריפט הפייתון והפלט שלו |
+| `PostgresGenerateSeries/` | שיטה C – generate_series |
 | `selectAll.sql` | שליפה מכל הטבלאות וספירת שורות |
 | `welfare_ERD.erdplus`, `welfare_ERD.png` | תרשים ERD |
 | `welfare_DSD.png` | תרשים DSD |
