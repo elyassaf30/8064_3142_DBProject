@@ -272,21 +272,21 @@ python Programing/generate_data.py
 
 ## גיבוי ושחזור
 
-שני גיבויים מ-17.11.2026, בשתי שיטות:
+שני גיבויים מ-22.11.2026, בשתי שיטות. בדקנו את שני הקבצים עם `pg_restore --list`, ובשניהם יש את הנתונים של כל 13 הטבלאות.
 
-1. **שורת פקודה** (`pg_dump`): `backup_2026-11-17.backup`
+1. **שורת פקודה** (`pg_dump`, הורץ מתוך cmd בתיקייה הראשית): `backup_2026-11-22.backup`
 
 </div>
 
 ```
-docker exec PostgreSQL_DB pg_dump -U welfare_user -d welfare_db -F c -f /backups/backup_2026-11-17.backup
+docker exec PostgreSQL_DB pg_dump -U "Aciva&Elyassaf" -d "Aciva&Elyassaf" -F c > "שלב אackup_2026-11-22.backup"
 ```
 
 <div dir="rtl">
 
 <img src="screens/backup_cmd.png" width="800">
 
-2. **pgAdmin** (Backup מתוך הממשק): `backup_2026-11-17_pgadmin.backup`
+2. **pgAdmin** (Backup מתוך הממשק, בפורמט Custom): `backup_2026-11-22_pgadmin.backup`
 
 <img src="screens/backup_pgadmin.png" width="800">
 
@@ -297,9 +297,9 @@ docker exec PostgreSQL_DB pg_dump -U welfare_user -d welfare_db -F c -f /backups
 </div>
 
 ```
-docker cp "backup_2026-11-17.backup" PostgreSQL_DB:/tmp/backup.backup
-docker exec PostgreSQL_DB createdb -U welfare_user welfare_restore
-docker exec PostgreSQL_DB pg_restore -U welfare_user -d welfare_restore /tmp/backup.backup
+docker cp "backup_2026-11-22.backup" PostgreSQL_DB:/tmp/backup.backup
+docker exec PostgreSQL_DB createdb -U "Aciva&Elyassaf" welfare_restore
+docker exec PostgreSQL_DB pg_restore -U "Aciva&Elyassaf" -d welfare_restore /tmp/backup.backup
 ```
 
 <div dir="rtl">
@@ -321,6 +321,6 @@ docker exec PostgreSQL_DB pg_restore -U welfare_user -d welfare_restore /tmp/bac
 | `welfare_DSD.png` | תרשים DSD |
 | `אפיון מערכת.md` | מסמך האפיון |
 | `screens/` | צילומי המסכים |
-| `backup_2026-11-17*.backup` | קובצי הגיבוי |
+| `backup_2026-11-22.backup`, `backup_2026-11-22_pgadmin.backup` | קובצי הגיבוי |
 
 </div>
