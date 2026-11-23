@@ -279,7 +279,7 @@ python Programing/generate_data.py
 </div>
 
 ```
-docker exec PostgreSQL_DB pg_dump -U "Aciva&Elyassaf" -d "Aciva&Elyassaf" -F c > "שלב אackup_2026-11-22.backup"
+docker exec PostgreSQL_DB pg_dump -U "Aciva&Elyassaf" -d "Aciva&Elyassaf" -F c > "שלב א\backup_2026-11-22.backup"
 ```
 
 <div dir="rtl">
@@ -298,8 +298,8 @@ docker exec PostgreSQL_DB pg_dump -U "Aciva&Elyassaf" -d "Aciva&Elyassaf" -F c >
 
 ```
 docker cp "backup_2026-11-22.backup" PostgreSQL_DB:/tmp/backup.backup
-docker exec PostgreSQL_DB createdb -U "Aciva&Elyassaf" welfare_restore
-docker exec PostgreSQL_DB pg_restore -U "Aciva&Elyassaf" -d welfare_restore /tmp/backup.backup
+docker exec PostgreSQL_DB createdb -U welfare_user welfare_restore
+docker exec PostgreSQL_DB pg_restore -U welfare_user -d welfare_restore --no-owner --no-privileges /tmp/backup.backup
 ```
 
 <div dir="rtl">
